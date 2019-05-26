@@ -276,6 +276,30 @@ class HtmlDeltaTest(HtmlTestHelpers, CoverageTest):
         assert "htmlcov/helper2_py.html" in self.files_written
         assert "htmlcov/main_file_py.html" in self.files_written
 
+    def test_deleted_html_recovery(self):
+        self.create_initial_files()
+        self.run_coverage()
+
+        self.assert_exists("htmlcov/helper1_py.html")
+        os.remove("htmlcov/helper1_py.html")
+        self.assert_doesnt_exist("htmlcov/helper1_py.html")
+
+        self.run_coverage()
+        assert "htmlcov/helper1_py.html" in self.files_written
+        self.assert_exists("htmlcov/helper1_py.html")
+
+    def test_mutated_html_recovery(self):
+        self.create_initial_files()
+        self.run_coverage()
+
+        self.assert_exists("htmlcov/helper1_py.html")
+        with open("htmlcov/helper1_py.html", 'a') as f:
+            f.write("ABC")
+        self.assert_exists("htmlcov/helper1_py.html")
+
+        self.run_coverage()
+        assert "htmlcov/helper1_py.html" in self.files_written
+
 
 class HtmlTitleTest(HtmlTestHelpers, CoverageTest):
     """Tests of the HTML title support."""
